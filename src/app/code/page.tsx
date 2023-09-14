@@ -3,7 +3,7 @@
 import Editor from "@monaco-editor/react";
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useMutation, useQuery } from "convex/react";
+import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
 
@@ -20,7 +20,9 @@ export default function Code() {
 		id: roomId as Id<"rooms">,
 	});
 	const [value, setValue] = useState<string>(checkRoomId?.code);
+	const [language, setLanguage] = useState<string>("javascript");
 	const updateRoom = useMutation(api.rooms.updateRoom);
+	const saveFileInStorage = useAction(api.rooms.saveFileInStorage);
 
 	useEffect(() => {
 		setValue(checkRoomId?.code);
@@ -45,15 +47,29 @@ export default function Code() {
         });
     }, [editorRef])
 
+	const handleFileSave = async () => {
+		await saveFileInStorage({
+			id: roomId as Id<"rooms">,
+			value: value,
+			language: language,
+		});
+	}
+
 	return (
 		<>
+			<button
+				className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-2"
+				onClick={handleFileSave}
+			>
+				save
+			</button>
 			{checkRoomId && (
 				<Editor
 					height="90vh"
 					theme="vs-dark"
 					value={value}
 					onChange={(e) => e !== undefined && setValue(e)}
-					defaultLanguage="javascript"
+					defaultLanguage={language}
 					onMount={handleEditorDidMount}
 					// defaultValue={checkRoomId.code}
 				/>
