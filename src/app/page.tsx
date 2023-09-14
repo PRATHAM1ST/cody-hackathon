@@ -4,7 +4,7 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
 export default function Home() {
-	const tasks = useQuery(api.rooms.getRooms);
+	const tasks = useQuery(api.tasks.get);
 	const addTask = useMutation(api.tasks.post);
 	const deleteTask = useMutation(api.tasks.deleteTask);
 	const [value, setValue] = useState("");
@@ -21,7 +21,7 @@ export default function Home() {
 					}
 				}}
 			/>
-			{tasks?.map(({ _id, code }) => (
+			{tasks?.map(({ _id, text }) => (
 				<div
 					key={_id.toString()}
 					onClick={() =>
@@ -30,7 +30,7 @@ export default function Home() {
 						})
 					}
 				>
-					{code}
+					{text}
 				</div>
 			))}
 		</main>

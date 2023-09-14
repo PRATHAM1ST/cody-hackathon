@@ -1,7 +1,7 @@
 "use client";
 
-import Editor, { useMonaco } from "@monaco-editor/react";
-import { use, useEffect, useRef, useState } from "react";
+import Editor from "@monaco-editor/react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
@@ -13,18 +13,18 @@ export default function Code() {
 
 	function handleEditorDidMount(editor: any, monaco: any) {
 		editorRef.current = editor;
-        console.log(editor);
-        console.log(monaco);
 	}
-
-
 
 	const roomId = query.get("room") as string;
 	const checkRoomId = useQuery(api.rooms.getRoomById, {
 		id: roomId as Id<"rooms">,
 	});
-	const [value, setValue] = useState(checkRoomId?.code);
+	const [value, setValue] = useState<string>(checkRoomId?.code);
 	const updateRoom = useMutation(api.rooms.updateRoom);
+
+	useEffect(() => {
+		setValue(checkRoomId?.code);
+	}, [checkRoomId]);
 
 	useEffect(() => {
 		const delayDebounceFn = setTimeout(() => {
@@ -52,7 +52,7 @@ export default function Code() {
 					height="90vh"
 					theme="vs-dark"
 					value={value}
-					onChange={(e) => e && setValue(e)}
+					onChange={(e) => e !== undefined && setValue(e)}
 					defaultLanguage="javascript"
 					onMount={handleEditorDidMount}
 					// defaultValue={checkRoomId.code}
